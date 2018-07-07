@@ -1,7 +1,7 @@
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/heart";
 var xlsx = require('node-xlsx').default;
-var xlsxName = './xlsx/all.xlsx';
+var xlsxName = './xlsx/shanghai-all.xlsx';
 
 MongoClient.connect(url, { useNewUrlParser: true },function(err, db) {
   if (err) throw err;
@@ -38,7 +38,7 @@ function getXlsxData(){
       "district":item[12],
       "businessZones":item[13],
       "formatCreateTime":item[14],
-      "city":"深圳"
+      "city":"上海"
     });
   }
   return rs;
