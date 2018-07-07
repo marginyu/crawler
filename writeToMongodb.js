@@ -32,11 +32,12 @@ function getXlsxData(){
       "minSalary":item[6],
       "maxSalary":item[7],
       "positionAdvantage":item[8],
-      "workYear":item[9],
-      "education":item[10],
-      "district":item[11],
-      "businessZones":item[12],
-      "formatCreateTime":item[13],
+      "companyFullName":item[9],
+      "workYear":item[10],
+      "education":item[11],
+      "district":item[12],
+      "businessZones":item[13],
+      "formatCreateTime":item[14],
       "city":"深圳"
     });
   }

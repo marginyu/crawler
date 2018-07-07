@@ -3,7 +3,7 @@ const cheerio = require('cheerio');
 var xlsx = require('node-xlsx').default;
 var fs = require('fs');
 var startIndex = 1;
-var xlsxName = './e-commerce.xlsx';
+var xlsxName = './shanghai-all.xlsx';
 
 const columns = [
   "companyShortName","companySize","financeStage","companyLabelList","industryField",
@@ -53,9 +53,9 @@ const reptileUrl = 'https://www.lagou.com/jobs/positionAjax.json';
 function getData(pn){
   superagent.post(reptileUrl).query({
     //jd: '未融资,上市公司,不需要融资',
-    hy: '电子商务',
+    //hy: '电子商务',
     px: 'default',
-    city: '深圳',
+    city: '上海',
     first: false,
     pn: pn,
     kd: '前端',
