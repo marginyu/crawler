@@ -1,5 +1,6 @@
 var express = require('express');
 var app = express();
+var getJobsByCity = require('./model');
 
 //  主页输出 "Hello World"
 app.get('/', function (req, res) {
@@ -32,6 +33,15 @@ app.get('/ab*cd', function(req, res) {
   res.send('正则匹配');
 })
 
+app.get('/job',function(req, res){
+  var city = req.query.city;
+  console.log('拿到城市的参数：', city);
+  getJobsByCity(city,function(result){
+    console.log('拿到了', result);
+    res.json(result);
+  });
+
+});
 
 var server = app.listen(8081, function () {
 

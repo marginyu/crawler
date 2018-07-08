@@ -1,8 +1,8 @@
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/heart";
-// mongodb API文档： http://mongodb.github.io/node-mongodb-native/2.0/api/index.html
+// nodejs mongodb驱动 API文档： http://mongodb.github.io/node-mongodb-native/2.0/api/index.html
 //统计岗位总数，待遇梯度，排名前10的岗位详情
-function getJobsByCity(city) {
+function getJobsByCity(city,callback) {
   var rs = {};
   MongoClient.connect(url, { useNewUrlParser: true },function(err, db) {
     if (err) throw err;
@@ -21,6 +21,7 @@ function getJobsByCity(city) {
           //console.log('>>>>', res);
           rs.salaryInfo = res;
           console.log('>>>>>最终结果出来了：', rs);
+          callback && callback(rs);
           db.close();
         });
       });
@@ -28,4 +29,6 @@ function getJobsByCity(city) {
   });
 }
 
-getJobsByCity("北京");
+// getJobsByCity("北京");
+
+module.exports = getJobsByCity;
