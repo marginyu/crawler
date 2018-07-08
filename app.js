@@ -3,7 +3,8 @@ const cheerio = require('cheerio');
 var xlsx = require('node-xlsx').default;
 var fs = require('fs');
 var startIndex = 1;
-var xlsxName = './shanghai-all.xlsx';
+var xlsxName = './sz-all.xlsx';
+var city = '深圳';
 
 const columns = [
   "companyShortName","companySize","financeStage","companyLabelList","industryField",
@@ -25,7 +26,16 @@ function format(arr){
         if(salaryArr.length > 1){
           itemArr.push(parseInt(salaryArr[0].replace(/k|K/g,'')));
           itemArr.push(parseInt(salaryArr[1].replace(/k|K/g,'')));
+        }else{
+          itemArr.push(0);
+          itemArr.push(0);
         }
+      }else if(key == 'companyShortName'){
+        itemArr.push(_data);
+        itemArr.push('https://www.lagou.com/gongsi/' + item["companyId"] + '.html');
+      }else if(key == 'positionName'){
+        itemArr.push(_data);
+        itemArr.push('https://www.lagou.com/jobs/' + item["positionId"] + '.html');
       }else{
         //如果是数组类型
         if(_data instanceof Array){
@@ -55,7 +65,7 @@ function getData(pn){
     //jd: '未融资,上市公司,不需要融资',
     //hy: '电子商务',
     px: 'default',
-    city: '上海',
+    city: city,
     first: false,
     pn: pn,
     kd: '前端',
