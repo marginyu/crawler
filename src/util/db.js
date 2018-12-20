@@ -46,6 +46,34 @@ function Db(){
       });
     });
   };
+
+  // 插入抓取记录
+  this.addcrawlerRecord = function(data){
+    MongoClient.connect(url, { useNewUrlParser: true },function(err, db) {
+      if (err) throw err;
+      console.log("数据库已创建!");
+      var dbase = db.db("lagou");
+      dbase.collection("crawlerRecord").insert(data, function(err, res) {
+        if (err) throw err;
+        console.log("文档插入成功");
+        db.close();
+      });
+    });
+  };
+
+  // 获取最新的抓取记录
+  this.getNewestCrawlerRecord = function(callback){
+    MongoClient.connect(url, { useNewUrlParser: true },function(err, db) {
+      if (err) throw err;
+      console.log("数据库已创建!");
+      var dbase = db.db("lagou");
+      dbase.collection("crawlerRecord").find({}).sort({"_id": -1}).limit(1).toArray(function(err, result) {
+        if (err) throw err;
+        callback && callback(result);
+        db.close();
+      });
+    });
+  };
 }
 
 
