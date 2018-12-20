@@ -9,8 +9,6 @@ function update(i=1, res, total=0){
   }
   lagou.getPostionData(i, '深圳', '前端', function(data){
     if(data && data.length){
-      console.log('data', data.length, data);
-      if(i === 1) dbInstance.empty();
       data = data.map(function(item,index){
         var salary = item.salary;
         var salaryArr = salary.split('-');
@@ -23,11 +21,16 @@ function update(i=1, res, total=0){
         }
         return item;
       });
-      dbInstance.insert(data);
+      console.log('当前分页'+i+',累计总数'+(total+data.length));
+      if(i === 1) {
+        dbInstance.empty(function(){ dbInstance.insert(data);});
+      } else {
+        dbInstance.insert(data);
+      }
       i++;
       setTimeout(function(){
         update(i,res, total + data.length);
-      },0);
+      }, 0);
     }else{
       if(data === false){
         res.send('抓取失败，被拉勾反爬虫发现了');

@@ -18,7 +18,7 @@ function Db(){
   };
 
   // 清空数据
-  this.empty = function(){
+  this.empty = function(callback){
     console.log('清空数据');
     MongoClient.connect(url, { useNewUrlParser: true },function(err, db) {
       if (err) throw err;
@@ -27,6 +27,7 @@ function Db(){
       dbase.collection("job").remove({},function(err, res){
         if (err) throw err;
         console.log("文档清空成功");
+        callback && callback();
         db.close();
       });
     });
