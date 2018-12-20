@@ -2,9 +2,12 @@ const superagent = require('superagent');
 const cheerio = require('cheerio');
 var xlsx = require('node-xlsx').default;
 var fs = require('fs');
-var startIndex = 1;
-var xlsxName = './sz-all.xlsx';
+var startIndex = 0;
 var city = '深圳';
+var position = '前端';
+var d = new Date();
+var time = d.getFullYear() + '-' + (d.getMonth()+1) + '-'+ d.getDate();
+var xlsxName = './xlsx/'+time+'_'+city+'_'+position+'.xlsx';
 
 const columns = [
   "companyShortName","companySize","financeStage","companyLabelList","industryField",
@@ -49,13 +52,22 @@ function format(arr){
   return rs;
 }
 
-function writeToXlsx(data){
+function writeToXlsx(data,pn){
+  //如果不存在该文件则创建
+  const exists = fs.existsSync(xlsxName);
+  if(!exists){
+    fs.writeFileSync(xlsxName);
+  }else if(pn==0){
+    console.warn('******可能重复抓取******');
+    return false;
+  }
   const workSheetsFromFile = xlsx.parse(xlsxName);
-  var original = workSheetsFromFile[0].data;
+  var original = workSheetsFromFile[0].data ? workSheetsFromFile[0].data : [];
   //添加数据
   var newData = original.concat(data);
   var buffer = xlsx.build([{name: "mySheetName", data: newData}]); // Returns a buffer
   fs.writeFileSync(xlsxName, buffer);
+  return true;
 }
 
 const reptileUrl = 'https://www.lagou.com/jobs/positionAjax.json';
@@ -68,7 +80,7 @@ function getData(pn){
     city: city,
     first: false,
     pn: pn,
-    kd: '前端',
+    kd: position,
     needAddtionalResult: false
   }).set('Content-Type', 'application/x-www-form-urlencoded')
     .set('Origin', 'https://www.lagou.com')
@@ -79,25 +91,28 @@ function getData(pn){
     .end(function (err, res) {
       // 抛错拦截
       if(err){
-        console.log(err);
+        console.warn('数据抓取失败', err);
+        return;
       }
       var rs = JSON.parse(res.text);
       if(rs.success){
         console.log('>>>>>成功了<<<<<<,当前分页：'+ pn);
         var data = rs.content.positionResult.result;
         var finalData = format(data);
-        //console.log(finalData);
-        writeToXlsx(finalData);
-        console.log(pn + ':excel写入成功');
-        if(data.length > 0){
-          console.log('请求新的分页：' + (pn+1));
-          //间隔2秒
-          setTimeout(function(){
+        var rs = writeToXlsx(finalData, pn);
+        if(rs){
+          console.log(pn + ':excel写入成功');
+          if(data.length){
+            console.log('请求新的分页：' + (pn+1));
             getData(pn+1);
-          },2500);
+          }else{
+            console.log('=========数据抓取完毕==========');
+          }
+        }else{
+          console.warn(pn + ':excel写入失败');
         }
       }else{
-        console.log('操作失败');
+        console.warn('操作失败');
       }
     });
 }
