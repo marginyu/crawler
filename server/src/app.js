@@ -8,6 +8,7 @@ app.get('/', function (req, res) {
 })
 
 app.get('/getPositionList', function (req, res) {
+  res.header('Access-Control-Allow-Origin', '*');
   console.log("获取岗位列表", req.query);
   var num = 10;
   if(req.query.num){
