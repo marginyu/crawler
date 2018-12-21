@@ -3,7 +3,7 @@ var MongoClient = require('mongodb').MongoClient;
 function Db(){
   var url = "mongodb://localhost:27017/";
 
-  this.go =  function(){
+  this.go = function(){
     MongoClient.connect(url, { useNewUrlParser: true },function(err, db) {
       if (err) throw err;
       console.log("数据库已创建!");
@@ -16,7 +16,30 @@ function Db(){
       );
     });
   };
+
+  this.groupUse = function(){
+    MongoClient.connect(url, { useNewUrlParser: true },function(err, db) {
+      if (err) throw err;
+      console.log("数据库已创建!");
+      var dbase = db.db("lagou");
+      dbase.collection("job").group(['averageSalary'], {minSalary: {$gt: 0}}, {"count":0}, "function (obj," +
+        " prev) { prev.count++; }", function(err, results) {
+        console.log(results.sort(sortNumber));
+      });
+    });
+  };
 }
 
+function sortNumber(a,b)
+{
+  return a.count - b.count
+}
+
+function sortSalary(a,b)
+{
+  return a.averageSalary - b.averageSalary
+}
+
+
 var _db = new Db();
-_db.go();
+_db.groupUse();
