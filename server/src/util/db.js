@@ -34,17 +34,19 @@ function Db(){
   };
 
   // 只获取薪资最高的20条记录
-  this.query = function(city, position, num, callback){
-    MongoClient.connect(url, { useNewUrlParser: true },function(err, db) {
+  this.query = function(city, position, num, pageIndex, callback){
+    console.log(num, pageIndex);
+    MongoClient.connect(url, { useNewUrlParser: true },async function(err, db) {
       if (err) throw err;
       console.log("数据库已创建!");
       var dbase = db.db("lagou");
-      dbase.collection("job").find({"city":city}).sort({"minSalary": -1}).limit(num).toArray(function(err, result) {
-        if (err) throw err;
-        //console.log(result);
-        callback && callback(result);
-        db.close();
+      const result  = await dbase.collection("job").find({"city":city}).sort({"minSalary": -1}).skip(pageIndex*num).limit(num).toArray();
+      const count = await dbase.collection("job").find({}).count();
+      callback({
+        result,
+        count,
       });
+      db.close();
     });
   };
 

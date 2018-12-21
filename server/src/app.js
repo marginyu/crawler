@@ -11,10 +11,11 @@ app.get('/getPositionList', function (req, res) {
   res.header('Access-Control-Allow-Origin', '*');
   console.log("获取岗位列表", req.query);
   var num = 10;
-  if(req.query.num){
-    num = parseInt(req.query.num);
+  var pageIndex = 0;
+  if(req.query.pageIndex){
+    pageIndex = parseInt(req.query.pageIndex) - 1;
   }
-  position.get(num, res);
+  position.get(num,pageIndex,res);
   //res.send('岗位列表信息获取成功');
 })
 

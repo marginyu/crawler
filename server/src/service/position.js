@@ -48,8 +48,8 @@ function update(i=1, res, total=0){
   });
 }
 
-function get(num, res){
-  dbInstance.query('深圳','前端',num, function(rs){
+function get(num, pageIndex, res){
+  dbInstance.query('深圳','前端',num, pageIndex, function(rs){
     //console.log('拿到了', rs);
     res.send(rs);
   });

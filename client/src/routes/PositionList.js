@@ -8,6 +8,7 @@ class PositionList extends Component{
   constructor(props) {
     super(props);
     this.state = {
+      count: 0,
       dataSource: [],
       columns:
         [{
@@ -44,16 +45,31 @@ class PositionList extends Component{
   }
 
   componentWillMount() {
-    request('http://10.240.3.44:8081/getPositionList').then((data)=>{
-      console.log(data);
-      this.setState({
-        dataSource: data.data
-      });
-    });
+    this.getDate(1);
   }
 
+  getDate = (current)=>{
+    console.log('current', current);
+    request('http://127.0.0.1:8081/getPositionList?pageIndex='+current).then((data)=>{
+      console.log(data);
+      this.setState({
+        dataSource: data.data.result,
+        count: data.data.count
+      });
+    });
+  };
+
   render(){
-    return(<Table dataSource={this.state.dataSource} columns={this.state.columns} />);
+    return(<Table
+    pagination={{
+      pageSize: 20,
+      total: this.state.count,
+      onChange: (current) => {
+        this.getDate(current)
+      },
+    }}
+    dataSource={this.state.dataSource}
+    columns={this.state.columns} />);
   }
 }
 
