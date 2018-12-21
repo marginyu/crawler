@@ -16,6 +16,7 @@ class PositionList extends Component{
     this.state = {
       count: 0,
       statis:[],
+      list:[['foo', 12], ['bar', 6]],
       dataSource: [],
       columns:
         [{
@@ -129,8 +130,9 @@ class PositionList extends Component{
   };
 
   // 词云
-  renderWordCloud = () => {
-
+  componentDidMount = () => {
+    // eslint-disable-next-line
+    //WordCloud(document.getElementById('canvas'), { list: this.state.list, backgroundColor: '#f0f0f0' } );
   };
 
   render(){
@@ -138,6 +140,12 @@ class PositionList extends Component{
       <div className={styles.container}>
         {this.renderTable()}
         {this.renderChart()}
+        {/*
+         <div>
+          <h1>岗位要求</h1>
+          <canvas id="canvas" className={styles.canvas} ></canvas>
+        </div>
+        */}
       </div>
         );
   }
