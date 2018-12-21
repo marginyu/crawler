@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import { Table } from 'antd';
 import request from '../utils/request';
-
+import styles from './PositionList.css';
 
 class PositionList extends Component{
   constructor(props) {
@@ -60,8 +60,12 @@ class PositionList extends Component{
   };
 
   render(){
-    return(<Table
+    return(
+      <div className={styles.container}>
+        <div className={styles.num}>岗位数量：{this.state.count}</div>
+      <Table
     pagination={{
+      showQuickJumper: true,
       pageSize: 20,
       total: this.state.count,
       onChange: (current) => {
@@ -69,7 +73,10 @@ class PositionList extends Component{
       },
     }}
     dataSource={this.state.dataSource}
-    columns={this.state.columns} />);
+    columns={this.state.columns} />
+
+      </div>
+        );
   }
 }
 
