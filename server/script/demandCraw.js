@@ -19,6 +19,7 @@ function craw(positionId,callback){
       }else{
         const _res = filterDemand(res.text);
         callback && callback(_res);
+        //console.log(_res);
       }
     });
 }
@@ -28,9 +29,12 @@ function filterDemand(html) {
   if (html) {
     // 沿用JQuery风格，定义$
    // var $ = cheerio.load('<div class = "job_bt"><div><p>xiaomei</p>abc</div></div>');
-    var $ = cheerio.load(html);
+    var $ = cheerio.load(html, {decodeEntities: false});
     var t = $('.job_bt').find('div');
-    return t.text().trim();
+    if(t.html()){
+      return t.html().trim();
+    }
+    return null;
   } else {
     console.log('无数据传入！');
   }
@@ -45,14 +49,14 @@ function main(){
     if (err) throw err;
     console.log("数据库已创建!");
     var dbase = db.db("lagou");
-    const result  = await dbase.collection("job").find({"city":'深圳',"demand":null}).sort({"minSalary": -1}).toArray();
+    const result  = await dbase.collection("job").find({"city":'深圳', "demandHtml":null}).sort({"minSalary": -1}).limit(500).toArray();
     console.log('长度',result.length);
     result.map(function(item,index2){
       //console.log('item', item);
       craw(item.positionId, async function(demandInfo){
         //console.log(item.positionId+'的岗位要求：',demandInfo);
         console.log('序号：'+(index++)+',岗位id:'+item.positionId + '成功了');
-        await dbase.collection("job").update({_id:item._id},{ $set:{demand:demandInfo} },true);
+        await dbase.collection("job").update({_id:item._id},{ $set:{demandHtml:demandInfo} },true);
         // if(index2 == result.length -1 ){
         //   console.log('db连接关闭');
         //   db.close();

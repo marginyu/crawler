@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Table } from 'antd';
+import { Table,Popover,Button } from 'antd';
 import request from '../utils/request';
 import {
   Chart,
@@ -32,6 +32,17 @@ class PositionList extends Component{
           render:(text, record)=>{
             let h = `https://www.lagou.com/jobs/${record["positionId"]}.html`;
             return (<a target='blank' href={h}>{text}</a>);
+          }
+        },{
+          title: '要求',
+          dataIndex: 'demandHtml',
+          render: text => {
+             const c = <div dangerouslySetInnerHTML={{__html: text}}></div>;
+             return (
+               <Popover overlayStyle={{width:'600px'}} content={c} title="你达到要求了吗？">
+                 <Button type="primary">查看</Button>
+               </Popover>
+             );
           }
         }, {
           title: '薪资范围',
