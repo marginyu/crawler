@@ -33,8 +33,12 @@ class PositionList extends Component{
             return (<a target='blank' href={h}>{text}</a>);
           }
         }, {
-          title: '薪资',
+          title: '薪资范围',
           dataIndex: 'salary'
+        }, {
+          title: '平均薪资',
+          dataIndex: 'averageSalary',
+          render: text => text+'k'
         }, {
           title: '规模',
           dataIndex: 'companySize'
@@ -126,7 +130,7 @@ class PositionList extends Component{
 
   // 词云
   renderWordCloud = () => {
-    
+
   };
 
   render(){
