@@ -20,14 +20,23 @@ app.get('/getPositionList', function (req, res) {
 })
 
 app.get('/updatePosition', function(req, res){
+  res.header('Access-Control-Allow-Origin', '*');
   console.log('更新岗位信息');
   position.update(1,res);
   // res.send('更新成功');
 })
 
 app.get('/getCrawlerInfo', function(req, res){
+  res.header('Access-Control-Allow-Origin', '*');
   console.log('获取上次爬取数据');
   position.getCrawlerInfo(res);
+})
+
+
+app.get('/getStatis', function(req, res){
+  res.header('Access-Control-Allow-Origin', '*');
+  console.log('获取统计信息');
+  position.getStatis(res);
 })
 
 var server = app.listen(8081, function () {

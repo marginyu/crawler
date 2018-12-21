@@ -61,9 +61,16 @@ function getCrawlerInfo(res){
   })
 };
 
+function getStatis(res){
+  dbInstance.getStatis(function(rs){
+    res.send(rs);
+  })
+};
+
 
 module.exports = {
   update:update,
   get:get,
   getCrawlerInfo:getCrawlerInfo,
+  getStatis: getStatis,
 };

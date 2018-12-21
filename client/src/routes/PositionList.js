@@ -2,6 +2,12 @@ import React, { Component } from 'react';
 import { connect } from 'dva';
 import { Table } from 'antd';
 import request from '../utils/request';
+import {
+  Chart,
+  Geom,
+  Axis,
+  Tooltip,
+} from "bizcharts";
 import styles from './PositionList.css';
 
 class PositionList extends Component{
@@ -9,6 +15,7 @@ class PositionList extends Component{
     super(props);
     this.state = {
       count: 0,
+      statis:[],
       dataSource: [],
       columns:
         [{
@@ -46,6 +53,7 @@ class PositionList extends Component{
 
   componentWillMount() {
     this.getDate(1);
+    this.getStatis();
   }
 
   getDate = (current)=>{
@@ -59,22 +67,73 @@ class PositionList extends Component{
     });
   };
 
+  getStatis = ()=>{
+    request('http://127.0.0.1:8081/getStatis').then((data)=>{
+      console.log(data);
+      const _data = data.data.map((d,index)=>{
+        d.averageSalary = d.averageSalary + 'k';
+        return d;
+      });
+      this.setState({
+        statis: _data
+      });
+    });
+  };
+
+  renderChart(){
+    const cols = {
+      count: {
+        tickInterval: 20
+      }
+    };
+
+    return (
+      <div>
+        <h1>薪资分布</h1>
+      <Chart data={this.state.statis}  forceFit>
+        <Axis name="averageSalary" />
+        <Axis name="count" />
+        <Tooltip
+          crosshairs={{
+            type: "y"
+          }}
+        />
+        <Geom type="interval" position="averageSalary*count" />
+      </Chart>
+      </div>
+    );
+  }
+
+  renderTable = ()=>{
+    return (
+      <div>
+        <h1>岗位列表</h1>
+        <div className={styles.num}>岗位数量：{this.state.count}</div>
+        <Table
+          pagination={{
+            showQuickJumper: true,
+            pageSize: 20,
+            total: this.state.count,
+            onChange: (current) => {
+              this.getDate(current)
+            },
+          }}
+          dataSource={this.state.dataSource}
+          columns={this.state.columns} />
+      </div>
+    );
+  };
+
+  // 词云
+  renderWordCloud = () => {
+    
+  };
+
   render(){
     return(
       <div className={styles.container}>
-        <div className={styles.num}>岗位数量：{this.state.count}</div>
-      <Table
-    pagination={{
-      showQuickJumper: true,
-      pageSize: 20,
-      total: this.state.count,
-      onChange: (current) => {
-        this.getDate(current)
-      },
-    }}
-    dataSource={this.state.dataSource}
-    columns={this.state.columns} />
-
+        {this.renderTable()}
+        {this.renderChart()}
       </div>
         );
   }

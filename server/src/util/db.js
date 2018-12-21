@@ -77,6 +77,30 @@ function Db(){
       });
     });
   };
+
+  // 获取统计信息
+  this.getStatis = function(callback){
+    MongoClient.connect(url, { useNewUrlParser: true },function(err, db) {
+      if (err) throw err;
+      console.log("数据库已创建!");
+      var dbase = db.db("lagou");
+      dbase.collection("job").group(['averageSalary'], {minSalary: {$gt: 0}}, {"count":0}, "function (obj," +
+        " prev) { prev.count++; }", function(err, results) {
+        var rs = results.sort(sortSalary);
+        console.log(rs);
+        callback && callback(rs);
+        db.close();
+      });
+    });
+  };
+}
+
+function sortNumber(a,b) {
+  return a.count - b.count
+}
+
+function sortSalary(a,b) {
+  return a.averageSalary - b.averageSalary
 }
 
 
