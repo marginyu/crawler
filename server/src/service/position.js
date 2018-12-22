@@ -67,10 +67,17 @@ function getStatis(res){
   })
 };
 
+function focus(id, res){
+  dbInstance.focus(id, function(rs){
+    res.send(rs);
+  })
+};
+
 
 module.exports = {
   update:update,
   get:get,
   getCrawlerInfo:getCrawlerInfo,
   getStatis: getStatis,
+  focus,
 };

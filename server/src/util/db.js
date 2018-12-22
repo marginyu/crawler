@@ -93,6 +93,18 @@ function Db(){
       });
     });
   };
+
+  // 关注
+  this.focus = function(positionId, callback){
+    MongoClient.connect(url, { useNewUrlParser: true },async function(err, db) {
+      if (err) throw err;
+      console.log("数据库已创建!");
+      var dbase = db.db("lagou");
+      await dbase.collection("job").update({positionId:positionId},{$set:{attention:1}},true);
+      callback && callback(200);
+      db.close();
+    });
+  };
 }
 
 function sortNumber(a,b) {

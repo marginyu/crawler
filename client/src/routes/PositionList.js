@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Table,Popover,Button } from 'antd';
+import { Table,Popover,Button, message } from 'antd';
 import request from '../utils/request';
 import {
   Chart,
@@ -21,7 +21,7 @@ class PositionList extends Component{
       columns:
         [{
           title: '公司',
-          dataIndex: 'companyFullName',
+          dataIndex: 'companyShortName',
           render: (text,record)=>{
             let h = `https://www.lagou.com/gongsi/${record['companyId']}.html`;
             return (<a target='blank' href={h}>{text}</a>);
@@ -36,10 +36,11 @@ class PositionList extends Component{
         },{
           title: '要求',
           dataIndex: 'demandHtml',
-          render: text => {
+          render: (text,record) => {
              const c = <div dangerouslySetInnerHTML={{__html: text}}></div>;
+             const title = `【${record['companyShortName']}】你达到要求了吗？`;
              return (
-               <Popover overlayStyle={{width:'600px'}} content={c} title="你达到要求了吗？">
+               <Popover overlayStyle={{width:'600px'}} content={c} title={title}>
                  <Button type="primary">查看</Button>
                </Popover>
              );
@@ -58,11 +59,23 @@ class PositionList extends Component{
           title: '融资阶段',
           dataIndex: 'financeStage'
         }, {
+          title: '领域',
+          dataIndex: 'industryField',
+        }, {
           title: '城市',
           dataIndex: 'city'
         }, {
           title: '区域',
           dataIndex: 'district'
+        },{
+          title: '操作',
+          dataIndex: 'positionId',
+          render: (text,record) => {
+            if(record["attention"]){
+              return '已关注';
+            }
+            return <div><a href="javascript:void(0)" onClick={()=>this.focus(text)}>关注</a></div>
+          }
         }]
     };
   }
@@ -71,6 +84,13 @@ class PositionList extends Component{
     this.getDate(1);
     this.getStatis();
   }
+
+  focus = (positionId)=>{
+    request('http://127.0.0.1:8081/focus?id='+positionId).then((data)=>{
+      message.success('关注成功');
+      this.getDate(this.state.current);
+    });
+  };
 
   getDate = (current)=>{
     console.log('current', current);
@@ -131,6 +151,9 @@ class PositionList extends Component{
             pageSize: 20,
             total: this.state.count,
             onChange: (current) => {
+              this.setState({
+                current
+              });
               this.getDate(current)
             },
           }}
