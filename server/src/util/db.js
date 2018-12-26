@@ -33,14 +33,14 @@ function Db(){
     });
   };
 
-  // 只获取薪资最高的20条记录
+  // 获取岗位列表
   this.query = function(city, position, num, pageIndex, callback){
     console.log(num, pageIndex);
     MongoClient.connect(url, { useNewUrlParser: true },async function(err, db) {
       if (err) throw err;
       console.log("数据库已创建!");
       var dbase = db.db("lagou");
-      const result  = await dbase.collection("job").find({"city":city}).sort({"minSalary": -1}).skip(pageIndex*num).limit(num).toArray();
+      const result  = await dbase.collection("job").find({"city":city, "flag": 0}).sort({"minSalary": -1}).skip(pageIndex*num).limit(num).toArray();
       const count = await dbase.collection("job").find({}).count();
       callback({
         result,
@@ -84,7 +84,7 @@ function Db(){
       if (err) throw err;
       console.log("数据库已创建!");
       var dbase = db.db("lagou");
-      dbase.collection("job").group(['averageSalary'], {minSalary: {$gt: 0}}, {"count":0}, "function (obj," +
+      dbase.collection("job").group(['averageSalary'], {flag: 0, minSalary: {$gt: 0}}, {"count":0}, "function (obj," +
         " prev) { prev.count++; }", function(err, results) {
         var rs = results.sort(sortSalary);
         console.log(rs);
@@ -101,6 +101,18 @@ function Db(){
       console.log("数据库已创建!");
       var dbase = db.db("lagou");
       await dbase.collection("job").update({positionId:positionId},{$set:{attention:1}},true);
+      callback && callback(200);
+      db.close();
+    });
+  };
+
+  // 删除
+  this.del = function(positionId, callback){
+    MongoClient.connect(url, { useNewUrlParser: true },async function(err, db) {
+      if (err) throw err;
+      console.log("数据库已创建!");
+      var dbase = db.db("lagou");
+      await dbase.collection("job").update({positionId:positionId},{$set:{flag: -1}},true);
       callback && callback(200);
       db.close();
     });

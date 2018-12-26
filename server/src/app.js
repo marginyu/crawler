@@ -47,6 +47,14 @@ app.get('/focus', function(req, res){
   position.focus(parseInt(id),res);
 });
 
+//删除
+app.get('/del', function(req, res){
+  res.header('Access-Control-Allow-Origin', '*');
+  const id = req.query.id;
+  console.log('岗位id',id);
+  position.del(parseInt(id),res);
+});
+
 var server = app.listen(8081, function () {
   var host = server.address().address
   var port = server.address().port

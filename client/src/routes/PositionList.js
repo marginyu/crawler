@@ -15,6 +15,7 @@ class PositionList extends Component{
     super(props);
     this.state = {
       count: 0,
+      current: 0,
       statis:[],
       list:[['foo', 12], ['bar', 6]],
       dataSource: [],
@@ -61,10 +62,12 @@ class PositionList extends Component{
         }, {
           title: '领域',
           dataIndex: 'industryField',
-        }, {
-          title: '城市',
-          dataIndex: 'city'
-        }, {
+        },
+        //   {
+        //   title: '城市',
+        //   dataIndex: 'city'
+        // },
+          {
           title: '区域',
           dataIndex: 'district'
         },{
@@ -74,7 +77,7 @@ class PositionList extends Component{
             if(record["attention"]){
               return '已关注';
             }
-            return <div><a href="javascript:void(0)" onClick={()=>this.focus(text)}>关注</a></div>
+            return <div><a href="javascript:void(0)" onClick={()=>this.focus(text)}>关注</a>&nbsp;<a href="javascript:void(0)" onClick={()=>this.del(text)}>删除</a></div>
           }
         }]
     };
@@ -84,6 +87,13 @@ class PositionList extends Component{
     this.getDate(1);
     this.getStatis();
   }
+
+  del = (positionId)=>{
+    request('http://127.0.0.1:8081/del?id='+positionId).then((data)=>{
+      message.success('删除成功');
+      this.getDate(this.state.current);
+    });
+  };
 
   focus = (positionId)=>{
     request('http://127.0.0.1:8081/focus?id='+positionId).then((data)=>{

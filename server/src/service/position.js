@@ -73,6 +73,12 @@ function focus(id, res){
   })
 };
 
+function del(id, res){
+  dbInstance.del(id, function(rs){
+    res.send(rs);
+  })
+};
+
 
 module.exports = {
   update:update,
@@ -80,4 +86,5 @@ module.exports = {
   getCrawlerInfo:getCrawlerInfo,
   getStatis: getStatis,
   focus,
+  del,
 };
