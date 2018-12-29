@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
-import { Table,Popover,Button, message } from 'antd';
+import { Table,Popover,Button, message,Input,Select } from 'antd';
 import request from '../utils/request';
 import {
   Chart,
@@ -9,6 +9,7 @@ import {
   Tooltip,
 } from "bizcharts";
 import styles from './PositionList.css';
+const Option = Select.Option;
 
 class PositionList extends Component{
   constructor(props) {
@@ -153,7 +154,6 @@ class PositionList extends Component{
   renderTable = ()=>{
     return (
       <div>
-        <h1>岗位列表</h1>
         <div className={styles.num}>岗位数量：{this.state.count}</div>
         <Table
           pagination={{
@@ -179,9 +179,48 @@ class PositionList extends Component{
     //WordCloud(document.getElementById('canvas'), { list: this.state.list, backgroundColor: '#f0f0f0' } );
   };
 
+
+  renderCondition = ()=>{
+    return (
+      <div>
+        <div className="item">
+          <div className={styles.left}>
+            <span className={styles.conditionName}>公司</span><Input style={{ width:120 }} />
+          </div>
+          <div className={styles.right}>
+            <span className={styles.conditionName}>融资阶段</span><Select defaultValue="all" style={{ width: 120 }}><Option value="all">全部</Option></Select>
+          </div>
+        </div>
+        <div className={styles.item}>
+          <div className={styles.left}>
+            <span className={styles.conditionName}>规模</span><Select defaultValue="all" style={{ width: 120 }}><Option value="all">全部</Option></Select>
+          </div>
+          <div className={styles.right}>
+            <span className={styles.conditionName}>领域</span><Select defaultValue="all" style={{ width: 120 }}><Option value="all">全部</Option></Select>
+          </div>
+        </div>
+        <div className={styles.item}>
+          <div className={styles.left}>
+            <span className={styles.conditionName}>工作地点</span><Select defaultValue="all" style={{ width: 120 }}><Option value="all">全部</Option></Select>
+          </div>
+          <div className={styles.right}>
+            <span className={styles.conditionName}>真实性</span><Select defaultValue="all" style={{ width: 120 }}><Option value="all">全部</Option></Select>
+          </div>
+        </div>
+        <div className={styles.item}>
+          <div className={styles.left}>
+            <span className={styles.conditionName}>关注情况</span><Select defaultValue="all" style={{ width: 120 }}><Option value="all">全部</Option></Select>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   render(){
     return(
       <div className={styles.container}>
+        <h1>岗位列表</h1>
+        {this.renderCondition()}
         {this.renderTable()}
         {this.renderChart()}
         {/*

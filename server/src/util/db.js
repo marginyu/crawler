@@ -41,7 +41,7 @@ function Db(){
       console.log("数据库已创建!");
       var dbase = db.db("lagou");
       const result  = await dbase.collection("job").find({"city":city, "flag": 0}).sort({"minSalary": -1}).skip(pageIndex*num).limit(num).toArray();
-      const count = await dbase.collection("job").find({}).count();
+      const count = await dbase.collection("job").find({"flag": 0}).count();
       callback({
         result,
         count,

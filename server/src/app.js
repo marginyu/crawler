@@ -32,7 +32,6 @@ app.get('/getCrawlerInfo', function(req, res){
   position.getCrawlerInfo(res);
 })
 
-
 app.get('/getStatis', function(req, res){
   res.header('Access-Control-Allow-Origin', '*');
   console.log('获取统计信息');

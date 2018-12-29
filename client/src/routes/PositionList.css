@@ -10,3 +10,24 @@
 .canvas{
   width: 100%;
 }
+
+.left{
+  float: left;
+  width: 400px;
+}
+
+.right{
+
+}
+
+.item{
+  margin: 10px 0;
+  overflow: hidden;
+}
+
+.conditionName{
+  width: 60px;
+  text-align: right;
+  display: inline-block;
+  margin-right: 10px;
+}
