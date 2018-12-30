@@ -34,17 +34,61 @@ function Db(){
   };
 
   // 获取岗位列表
-  this.query = function(city, position, num, pageIndex, callback){
-    console.log(num, pageIndex);
+  this.query = function(params, callback){
+    let {size, field, district, realFlag, focusFlag, financeStage, pageIndex} = params;
+    const num  = 10;
+    pageIndex = pageIndex - 1 ;
+    let _params = {"city":'深圳'};
+    if(size != 'all'){
+      _params.companySize = size;
+    }
+    if(field != 'all'){
+      _params.industryField = new RegExp(field, 'i');
+    }
+    if(financeStage != 'all'){
+      _params.financeStage = financeStage;
+    }
+    if(district != 'all'){
+      _params.district = district;
+    }
+    if(realFlag != 'all'){
+      _params.flag = (realFlag == 1)?0:-1;
+    }
+    if(focusFlag == 1){
+      _params.attention = 1;
+    }
+
+    console.log('查询参数',_params);
     MongoClient.connect(url, { useNewUrlParser: true },async function(err, db) {
       if (err) throw err;
       console.log("数据库已创建!");
       var dbase = db.db("lagou");
-      const result  = await dbase.collection("job").find({"city":city, "flag": 0}).sort({"minSalary": -1}).skip(pageIndex*num).limit(num).toArray();
-      const count = await dbase.collection("job").find({"flag": 0}).count();
+      //const result  = await dbase.collection("job").find({"city":city, "flag": 0}).sort({"minSalary":-1}).skip(pageIndex*num).limit(num).toArray();
+      // https://mongodb.github.io/node-mongodb-native/api-generated/collection.html#find
+      const result  = await dbase.collection("job").find(_params, {sort:[['minSalary',-1]]}).skip(pageIndex*num).limit(num).toArray();
+      const count = await dbase.collection("job").find(_params).count();
+      let condition = {
+        districtOptions:[],
+        fieldOptions:[],
+        financeOptions:[],
+        sizeOptions:[]
+      };
+      if(pageIndex == 0){
+        const districtOptions = await dbase.collection("job").distinct('district');
+        const fieldOptions = await dbase.collection("job").distinct('industryField');
+        const financeOptions = await dbase.collection("job").distinct('financeStage');
+        const sizeOptions = await dbase.collection("job").distinct('companySize');
+        condition = {
+            districtOptions,
+            fieldOptions,
+            financeOptions,
+            sizeOptions
+        }
+      }
       callback({
         result,
         count,
+        condition
       });
       db.close();
     });
@@ -87,7 +131,7 @@ function Db(){
       dbase.collection("job").group(['averageSalary'], {flag: 0, minSalary: {$gt: 0}}, {"count":0}, "function (obj," +
         " prev) { prev.count++; }", function(err, results) {
         var rs = results.sort(sortSalary);
-        console.log(rs);
+        //console.log(rs);
         callback && callback(rs);
         db.close();
       });

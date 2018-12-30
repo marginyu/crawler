@@ -48,11 +48,29 @@ function update(i=1, res, total=0){
   });
 }
 
-function get(num, pageIndex, res){
-  dbInstance.query('深圳','前端',num, pageIndex, function(rs){
-    //console.log('拿到了', rs);
+function get(params, res){
+  dbInstance.query(params, function(rs){
+    //console.log('拿到了', rs.condition);
+    rs.condition.districtOptions = rs.condition.districtOptions.filter((item)=>{
+      return item;
+    });
+    rs.condition.fieldOptions = format(rs.condition.fieldOptions);
     res.send(rs);
   });
+}
+
+function format(data){
+  let rs = [];
+  for(var i in data){
+    if(data[i].indexOf(',') > -1){
+      rs = rs.concat(data[i].split(','))
+    }else if(data[i].indexOf('、') > -1){
+      rs = rs.concat(data[i].split('、'))
+    }else if(data[i].indexOf(' ') > -1){
+      rs = rs.concat(data[i].split(' '))
+    }
+  }
+  return Array.from(new Set(rs));
 }
 
 function getCrawlerInfo(res){

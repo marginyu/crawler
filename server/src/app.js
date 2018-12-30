@@ -1,5 +1,17 @@
 var express = require('express');
+var bodyParser = require('body-parser');//解析,用req.body获取post参数
+
 var app = express();
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+// 允许所有的请求形式
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
+
 var position = require('./service/position');
 
 app.get('/', function (req, res) {
@@ -7,40 +19,35 @@ app.get('/', function (req, res) {
   res.send('Hello world');
 })
 
-app.get('/getPositionList', function (req, res) {
-  res.header('Access-Control-Allow-Origin', '*');
-  console.log("获取岗位列表", req.query);
-  var num = 10;
-  var pageIndex = 0;
-  if(req.query.pageIndex){
-    pageIndex = parseInt(req.query.pageIndex) - 1;
-  }
-  position.get(num,pageIndex,res);
+app.post('/getPositionList', function (req, res) {
+  console.log("获取岗位列表", req.body);
+  const params = req.body;
+  position.get(params,res);
   //res.send('岗位列表信息获取成功');
 })
 
 app.get('/updatePosition', function(req, res){
-  res.header('Access-Control-Allow-Origin', '*');
+
   console.log('更新岗位信息');
   position.update(1,res);
   // res.send('更新成功');
 })
 
 app.get('/getCrawlerInfo', function(req, res){
-  res.header('Access-Control-Allow-Origin', '*');
+
   console.log('获取上次爬取数据');
   position.getCrawlerInfo(res);
 })
 
 app.get('/getStatis', function(req, res){
-  res.header('Access-Control-Allow-Origin', '*');
+
   console.log('获取统计信息');
   position.getStatis(res);
 })
 
 //关注
 app.get('/focus', function(req, res){
-  res.header('Access-Control-Allow-Origin', '*');
+
   const id = req.query.id;
   console.log('岗位id',id);
   position.focus(parseInt(id),res);
@@ -48,7 +55,7 @@ app.get('/focus', function(req, res){
 
 //删除
 app.get('/del', function(req, res){
-  res.header('Access-Control-Allow-Origin', '*');
+
   const id = req.query.id;
   console.log('岗位id',id);
   position.del(parseInt(id),res);

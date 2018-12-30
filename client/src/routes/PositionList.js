@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 import { Table,Popover,Button, message,Input,Select } from 'antd';
-import request from '../utils/request';
+import request,{post} from '../utils/request';
 import {
   Chart,
   Geom,
@@ -16,7 +16,19 @@ class PositionList extends Component{
     super(props);
     this.state = {
       count: 0,
-      current: 0,
+      financeStage: 'all',
+      size: 'all',
+      district: 'all',
+      realFlag: 'all',
+      focusFlag: 'all',
+      field: 'all',
+      condition:{
+        financeOptions:[],
+        sizeOptions:[],
+        fieldOptions:[],
+        districtOptions:[],
+      },
+      current: 1,
       statis:[],
       list:[['foo', 12], ['bar', 6]],
       dataSource: [],
@@ -85,32 +97,47 @@ class PositionList extends Component{
   }
 
   componentWillMount() {
-    this.getDate(1);
+    this.getData(1);
     this.getStatis();
   }
 
   del = (positionId)=>{
     request('http://127.0.0.1:8081/del?id='+positionId).then((data)=>{
       message.success('删除成功');
-      this.getDate(this.state.current);
+      this.getData(this.state.current);
     });
   };
 
   focus = (positionId)=>{
     request('http://127.0.0.1:8081/focus?id='+positionId).then((data)=>{
       message.success('关注成功');
-      this.getDate(this.state.current);
+      this.getData(this.state.current);
     });
   };
 
-  getDate = (current)=>{
+  getData = (current)=>{
     console.log('current', current);
-    request('http://127.0.0.1:8081/getPositionList?pageIndex='+current).then((data)=>{
+    const {financeStage,size,field,district,realFlag,focusFlag} = this.state;
+    const params = {
+      financeStage,
+      size,
+      field,
+      district,
+      realFlag,
+      focusFlag,
+      pageIndex: current
+    };
+    post('http://127.0.0.1:8081/getPositionList', params).then((data)=>{
       console.log(data);
       this.setState({
         dataSource: data.data.result,
         count: data.data.count
       });
+      if(data.data.condition.districtOptions.length > 0){
+        this.setState({
+          condition:data.data.condition
+        });
+      }
     });
   };
 
@@ -157,6 +184,7 @@ class PositionList extends Component{
         <div className={styles.num}>岗位数量：{this.state.count}</div>
         <Table
           pagination={{
+            current: this.state.current,
             showQuickJumper: true,
             pageSize: 20,
             total: this.state.count,
@@ -164,7 +192,7 @@ class PositionList extends Component{
               this.setState({
                 current
               });
-              this.getDate(current)
+              this.getData(current)
             },
           }}
           dataSource={this.state.dataSource}
@@ -180,7 +208,19 @@ class PositionList extends Component{
   };
 
 
+  handleChange = (key, value) => {
+    console.log(`selected ${value}`);
+    const obj = {};
+    obj[key] = value;
+    obj.current = 1;
+    this.setState(obj, ()=>{
+      this.getData();
+    });
+  };
+
+
   renderCondition = ()=>{
+    const {condition} = this.state;
     return (
       <div>
         <div className="item">
@@ -188,28 +228,69 @@ class PositionList extends Component{
             <span className={styles.conditionName}>公司</span><Input style={{ width:120 }} />
           </div>
           <div className={styles.right}>
-            <span className={styles.conditionName}>融资阶段</span><Select defaultValue="all" style={{ width: 120 }}><Option value="all">全部</Option></Select>
+            <span className={styles.conditionName}>融资阶段</span><Select onChange={(value)=>this.handleChange('financeStage', value)} defaultValue="all" style={{ width: 120 }}>
+            <Option value="all">全部</Option>
+            {
+              condition.financeOptions.map((item)=>{
+                return  <Option value={item}>{item}</Option>;
+              })
+            }
+          </Select>
+
           </div>
         </div>
         <div className={styles.item}>
           <div className={styles.left}>
-            <span className={styles.conditionName}>规模</span><Select defaultValue="all" style={{ width: 120 }}><Option value="all">全部</Option></Select>
+            <span className={styles.conditionName}>规模</span><Select onChange={(value)=>this.handleChange('size', value)} defaultValue="all" style={{ width: 120 }}>
+            <Option value="all">全部</Option>
+            {
+              condition.sizeOptions.map((item)=>{
+                return  <Option value={item}>{item}</Option>;
+              })
+            }
+          </Select>
           </div>
           <div className={styles.right}>
-            <span className={styles.conditionName}>领域</span><Select defaultValue="all" style={{ width: 120 }}><Option value="all">全部</Option></Select>
+            <span className={styles.conditionName}>领域</span>
+            <Select onChange={(value)=>this.handleChange('field', value)} defaultValue="all" style={{ width: 120 }}>
+              <Option value="all">全部</Option>
+              {
+                condition.fieldOptions.map((item)=>{
+                  return  <Option value={item}>{item}</Option>;
+                })
+              }
+            </Select>
           </div>
         </div>
         <div className={styles.item}>
           <div className={styles.left}>
-            <span className={styles.conditionName}>工作地点</span><Select defaultValue="all" style={{ width: 120 }}><Option value="all">全部</Option></Select>
+            <span className={styles.conditionName}>工作地点</span>
+            <Select onChange={(value)=>this.handleChange('district', value)} defaultValue="all" style={{ width: 120 }}>
+              <Option value="all">全部</Option>
+              {
+                condition.districtOptions.map((item)=>{
+                  return  <Option value={item}>{item}</Option>;
+                })
+              }
+            </Select>
           </div>
           <div className={styles.right}>
-            <span className={styles.conditionName}>真实性</span><Select defaultValue="all" style={{ width: 120 }}><Option value="all">全部</Option></Select>
+            <span className={styles.conditionName}>真实性</span>
+            <Select onChange={(value)=>this.handleChange('realFlag', value)} defaultValue="all" style={{ width: 120 }}>
+            <Option value="all">全部</Option>
+            <Option value="1">真实</Option>
+            <Option value="0">虚假</Option>
+          </Select>
           </div>
         </div>
         <div className={styles.item}>
           <div className={styles.left}>
-            <span className={styles.conditionName}>关注情况</span><Select defaultValue="all" style={{ width: 120 }}><Option value="all">全部</Option></Select>
+            <span className={styles.conditionName}>关注情况</span>
+            <Select onChange={(value)=>this.handleChange('focusFlag', value)} defaultValue="all" style={{ width: 120 }}>
+              <Option value="all">全部</Option>
+              <Option value="1">已关注</Option>
+              <Option value="0">未关注</Option>
+            </Select>
           </div>
         </div>
       </div>
