@@ -35,7 +35,7 @@ function Db(){
 
   // 获取岗位列表
   this.query = function(params, callback){
-    let {size, field, district, realFlag, focusFlag, financeStage, pageIndex} = params;
+    let {size, field, district, realFlag, focusFlag, financeStage, sort, pageIndex} = params;
     const num  = 10;
     pageIndex = pageIndex - 1 ;
     let _params = {"city":'深圳'};
@@ -58,6 +58,13 @@ function Db(){
       _params.attention = (focusFlag == 1)?1:0;
     }
 
+    let sortColumn = 'averageSalary';
+    if(sort == 1){
+      sortColumn = 'maxSalary';
+    }else if(sort == 2){
+      sortColumn = 'minSalary';
+    }
+
     console.log('查询参数',_params);
     MongoClient.connect(url, { useNewUrlParser: true },async function(err, db) {
       if (err) throw err;
@@ -65,7 +72,7 @@ function Db(){
       var dbase = db.db("lagou");
       //const result  = await dbase.collection("job").find({"city":city, "flag": 0}).sort({"minSalary":-1}).skip(pageIndex*num).limit(num).toArray();
       // https://mongodb.github.io/node-mongodb-native/api-generated/collection.html#find
-      const result  = await dbase.collection("job").find(_params, {sort:[['minSalary',-1]]}).skip(pageIndex*num).limit(num).toArray();
+      const result  = await dbase.collection("job").find(_params, {sort:[[sortColumn,-1]]}).skip(pageIndex*num).limit(num).toArray();
       const count = await dbase.collection("job").find(_params).count();
       let condition = {
         districtOptions:[],

@@ -22,6 +22,7 @@ class PositionList extends Component{
       realFlag: 'all',
       focusFlag: 'all',
       field: 'all',
+      sort: 0,
       condition:{
         financeOptions:[],
         sizeOptions:[],
@@ -43,6 +44,7 @@ class PositionList extends Component{
         }, {
           title: '岗位',
           dataIndex: 'positionName',
+          width: 200,
           render:(text, record)=>{
             let h = `https://www.lagou.com/jobs/${record["positionId"]}.html`;
             return (<a target='blank' href={h}>{text}</a>);
@@ -134,7 +136,7 @@ class PositionList extends Component{
 
   getData = (current)=>{
     console.log('current', current);
-    const {financeStage,size,field,district,realFlag,focusFlag} = this.state;
+    const {financeStage,size,field,district,realFlag,focusFlag,sort} = this.state;
     const params = {
       financeStage,
       size,
@@ -142,6 +144,7 @@ class PositionList extends Component{
       district,
       realFlag,
       focusFlag,
+      sort,
       pageIndex: current
     };
     post('http://127.0.0.1:8081/getPositionList', params).then((data)=>{
@@ -307,6 +310,14 @@ class PositionList extends Component{
               <Option value="all">全部</Option>
               <Option value="1">已关注</Option>
               <Option value="0">未关注</Option>
+            </Select>
+          </div>
+          <div className={styles.right}>
+            <span className={styles.conditionName}>排序</span>
+            <Select onChange={(value)=>this.handleChange('sort', value)} defaultValue="0" style={{ width: 120 }}>
+              <Option value="0">平均工资降序</Option>
+              <Option value="1">工资上限降序</Option>
+              <Option value="2">工资下限降序</Option>
             </Select>
           </div>
         </div>
