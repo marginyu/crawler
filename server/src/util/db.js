@@ -54,8 +54,8 @@ function Db(){
     if(realFlag != 'all'){
       _params.flag = (realFlag == 1)?0:-1;
     }
-    if(focusFlag == 1){
-      _params.attention = 1;
+    if(focusFlag != 'all'){
+      _params.attention = (focusFlag == 1)?1:0;
     }
 
     console.log('查询参数',_params);
@@ -139,24 +139,31 @@ function Db(){
   };
 
   // 关注
-  this.focus = function(positionId, callback){
+  // attendtion：1，关注；0，未关注
+  this.focus = function(params, callback){
+    const positionId = parseInt(params.id);
+    const attention = params.flag ? 1: 0;
     MongoClient.connect(url, { useNewUrlParser: true },async function(err, db) {
       if (err) throw err;
       console.log("数据库已创建!");
       var dbase = db.db("lagou");
-      await dbase.collection("job").update({positionId:positionId},{$set:{attention:1}},true);
+      await dbase.collection("job").update({positionId:positionId},{$set:{attention:attention}},true);
       callback && callback(200);
       db.close();
     });
   };
 
   // 删除
-  this.del = function(positionId, callback){
+  // flag: -1, 已删除；0，未删除
+  this.del = function(params, callback){
+    const id = params.id;
+    const flag = params.flag ? -1: 0;
     MongoClient.connect(url, { useNewUrlParser: true },async function(err, db) {
       if (err) throw err;
       console.log("数据库已创建!");
+      console.log(id, flag);
       var dbase = db.db("lagou");
-      await dbase.collection("job").update({positionId:positionId},{$set:{flag: -1}},true);
+      await dbase.collection("job").update({companyId:id},{$set:{flag: flag}},{multi:true, upsert:true});
       callback && callback(200);
       db.close();
     });

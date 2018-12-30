@@ -46,19 +46,15 @@ app.get('/getStatis', function(req, res){
 })
 
 //关注
-app.get('/focus', function(req, res){
-
-  const id = req.query.id;
-  console.log('岗位id',id);
-  position.focus(parseInt(id),res);
+app.post('/focus', function(req, res){
+  const params = req.body;
+  position.focus(params,res);
 });
 
 //删除
-app.get('/del', function(req, res){
-
-  const id = req.query.id;
-  console.log('岗位id',id);
-  position.del(parseInt(id),res);
+app.post('/del', function(req, res){
+  const params = req.body;
+  position.del(params,res);
 });
 
 var server = app.listen(8081, function () {

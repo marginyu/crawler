@@ -85,14 +85,14 @@ function getStatis(res){
   })
 };
 
-function focus(id, res){
-  dbInstance.focus(id, function(rs){
+function focus(params, res){
+  dbInstance.focus(params, function(rs){
     res.send(rs);
   })
 };
 
-function del(id, res){
-  dbInstance.del(id, function(rs){
+function del(params, res){
+  dbInstance.del(params, function(rs){
     res.send(rs);
   })
 };

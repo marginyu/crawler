@@ -87,10 +87,19 @@ class PositionList extends Component{
           title: '操作',
           dataIndex: 'positionId',
           render: (text,record) => {
-            if(record["attention"]){
-              return '已关注';
+            let focusContent = null;
+            let delContent = null;
+            if(record["attention"] == 1){
+              focusContent = <a href="javascript:void(0)" onClick={()=>this.focus(text, false)}>取消关注</a>
+            }else{
+              focusContent = <a href="javascript:void(0)" onClick={()=>this.focus(text)}>关注</a>
             }
-            return <div><a href="javascript:void(0)" onClick={()=>this.focus(text)}>关注</a>&nbsp;<a href="javascript:void(0)" onClick={()=>this.del(text)}>删除</a></div>
+            if(record["flag"] == 0){
+              delContent = <a href="javascript:void(0)" onClick={()=>this.del(record["companyId"])}>删除</a>;
+            }else{
+              delContent = <a href="javascript:void(0)" onClick={()=>this.del(record["companyId"], false)}>恢复</a>;
+            }
+            return <div>{focusContent}&nbsp;{delContent}</div>
           }
         }]
     };
@@ -101,16 +110,24 @@ class PositionList extends Component{
     this.getStatis();
   }
 
-  del = (positionId)=>{
-    request('http://127.0.0.1:8081/del?id='+positionId).then((data)=>{
-      message.success('删除成功');
+  del = (companyId, flag = true)=>{
+    const params = {
+      id: companyId,
+      flag
+    };
+    post('http://127.0.0.1:8081/del', params).then((data)=>{
+      message.success('操作成功');
       this.getData(this.state.current);
     });
   };
 
-  focus = (positionId)=>{
-    request('http://127.0.0.1:8081/focus?id='+positionId).then((data)=>{
-      message.success('关注成功');
+  focus = (positionId, flag = true)=>{
+    const params = {
+      id: positionId,
+      flag,
+    };
+    post('http://127.0.0.1:8081/focus', params).then((data)=>{
+      message.success('操作成功');
       this.getData(this.state.current);
     });
   };
