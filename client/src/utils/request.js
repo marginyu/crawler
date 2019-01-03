@@ -1,7 +1,20 @@
 import fetch from 'dva/fetch';
+import { message } from 'antd';
+
 
 function parseJSON(response) {
   return response.json();
+}
+
+function checkLoginStatus(data){
+  console.log('>>>>>',data);
+  if (data.errcode == -1) {
+    message.warn('请先登录');
+    let a = window.location.origin + window.location.pathname;
+    window.location = a + '#/login';
+    return false;
+  }
+  return data;
 }
 
 function checkStatus(response) {
@@ -18,25 +31,25 @@ function checkStatus(response) {
  * Requests a URL, returning a promise.
  *
  * @param  {string} url       The URL we want to request
- * @param  {object} [options] The options we want to pass to "fetch"
  * @return {object}           An object containing either "data" or "err"
  */
-export default function request(url, options) {
-  return fetch(url, options)
+export default function request(url) {
+  return fetch(url, { credentials: 'include' })
     .then(checkStatus)
     .then(parseJSON)
-    .then(data => ({ data }))
+    .then(checkLoginStatus)
     .catch(err => ({ err }));
 }
 
 export function post(url, data){
   return fetch(url, {
+    credentials: 'include',
     body: JSON.stringify(data),
     method: 'POST',
     headers: {"Content-Type": "application/json"}
   })
     .then(checkStatus)
     .then(parseJSON)
-    .then(data => ({ data }))
+    .then(checkLoginStatus)
     .catch(err => ({ err }));
 }

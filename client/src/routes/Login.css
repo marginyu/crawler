@@ -1,0 +1,13 @@
+.container{
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.loginForm {
+  width: 300px;
+}
+
+.loginFormButton {
+  width: 100%;
+}

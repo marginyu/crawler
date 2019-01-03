@@ -9,6 +9,7 @@ import {
   Tooltip,
 } from "bizcharts";
 import styles from './PositionList.css';
+import config from '../config/index';
 const Option = Select.Option;
 
 class PositionList extends Component{
@@ -117,7 +118,7 @@ class PositionList extends Component{
       id: companyId,
       flag
     };
-    post('http://127.0.0.1:8081/del', params).then((data)=>{
+    post(`${config.server}/del`, params).then((data)=>{
       message.success('操作成功');
       this.getData(this.state.current);
     });
@@ -128,7 +129,7 @@ class PositionList extends Component{
       id: positionId,
       flag,
     };
-    post('http://127.0.0.1:8081/focus', params).then((data)=>{
+    post(`${config.server}/focus`, params).then((data)=>{
       message.success('操作成功');
       this.getData(this.state.current);
     });
@@ -147,30 +148,34 @@ class PositionList extends Component{
       sort,
       pageIndex: current
     };
-    post('http://127.0.0.1:8081/getPositionList', params).then((data)=>{
-      console.log(data);
-      this.setState({
-        dataSource: data.data.result,
-        count: data.data.count
-      });
-      if(data.data.condition.districtOptions.length > 0){
+    post(`${config.server}/getPositionList`, params).then((data)=>{
+      console.log('获取职位列表', data);
+      if(data !== false){
         this.setState({
-          condition:data.data.condition
+          dataSource: data.result,
+          count: data.count
         });
+        if(data.condition.districtOptions.length > 0){
+          this.setState({
+            condition:data.condition
+          });
+        }
       }
     });
   };
 
   getStatis = ()=>{
-    request('http://127.0.0.1:8081/getStatis').then((data)=>{
-      console.log(data);
-      const _data = data.data.map((d,index)=>{
-        d.averageSalary = d.averageSalary + 'k';
-        return d;
-      });
-      this.setState({
-        statis: _data
-      });
+    request(`${config.server}/getStatis`).then((data)=>{
+      console.log('获取统计信息', data);
+      if(data !== false){
+        const _data = data.map((d,index)=>{
+          d.averageSalary = d.averageSalary + 'k';
+          return d;
+        });
+        this.setState({
+          statis: _data
+        });
+      }
     });
   };
 
@@ -184,7 +189,7 @@ class PositionList extends Component{
     return (
       <div>
         <h1>薪资分布</h1>
-      <Chart data={this.state.statis}  forceFit>
+      <Chart data={this.state.statis}  forceFit height={500}>
         <Axis name="averageSalary" />
         <Axis name="count" />
         <Tooltip
