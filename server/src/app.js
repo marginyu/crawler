@@ -1,5 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');//解析,用req.body获取post参数
+var session = require('express-session');
 
 var app = express();
 app.use(bodyParser.json());
@@ -11,6 +12,16 @@ app.use(function(req, res, next) {
   next();
 });
 
+// 使用 session 中间件
+app.use(session({
+  secret :  'secret', // 对session id 相关的cookie 进行签名
+  resave : true,
+  saveUninitialized: false, // 是否保存未初始化的会话
+  cookie : {
+    maxAge : 1000 * 60 * 3, // 设置 session 的有效时间，单位毫秒
+  },
+}));
+
 
 var position = require('./service/position');
 
@@ -19,10 +30,31 @@ app.get('/', function (req, res) {
   res.send('Hello world');
 })
 
+app.post('/login', function(req, res){
+  const name = req.body.name;
+  const password = req.body.password;
+  if(name == 'xiaomei' && password == 'loveminer'){
+    req.session.userName = name;
+    res.send({errcode: 0});
+  }else{
+    res.send({errcode: -1, msg: "登录失败"});
+  }
+})
+
+// 退出
+app.get('/logout', function (req, res) {
+  req.session.userName = null; // 删除session
+  res.send({errcode: 0});
+});
+
 app.post('/getPositionList', function (req, res) {
-  console.log("获取岗位列表", req.body);
-  const params = req.body;
-  position.get(params,res);
+  if(req.session.userName){
+    console.log("获取岗位列表", req.body);
+    const params = req.body;
+    position.get(params,res);
+  }else{
+    res.send({errcode: -2, msg: "未登录"});
+  }
   //res.send('岗位列表信息获取成功');
 })
 

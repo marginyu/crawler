@@ -9,6 +9,7 @@ import {
   Tooltip,
 } from "bizcharts";
 import styles from './PositionList.css';
+import config from '../config/index';
 const Option = Select.Option;
 
 class PositionList extends Component{
@@ -117,7 +118,7 @@ class PositionList extends Component{
       id: companyId,
       flag
     };
-    post('http://127.0.0.1:8081/del', params).then((data)=>{
+    post(`${config.server}/del`, params).then((data)=>{
       message.success('操作成功');
       this.getData(this.state.current);
     });
@@ -128,7 +129,7 @@ class PositionList extends Component{
       id: positionId,
       flag,
     };
-    post('http://127.0.0.1:8081/focus', params).then((data)=>{
+    post(`${config.server}/focus`, params).then((data)=>{
       message.success('操作成功');
       this.getData(this.state.current);
     });
@@ -147,7 +148,7 @@ class PositionList extends Component{
       sort,
       pageIndex: current
     };
-    post('http://127.0.0.1:8081/getPositionList', params).then((data)=>{
+    post(`${config.server}/getPositionList`, params).then((data)=>{
       console.log(data);
       this.setState({
         dataSource: data.data.result,
@@ -162,7 +163,7 @@ class PositionList extends Component{
   };
 
   getStatis = ()=>{
-    request('http://127.0.0.1:8081/getStatis').then((data)=>{
+    request(`${config.server}/getStatis`).then((data)=>{
       console.log(data);
       const _data = data.data.map((d,index)=>{
         d.averageSalary = d.averageSalary + 'k';
