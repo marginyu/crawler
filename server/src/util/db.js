@@ -1,7 +1,7 @@
 var MongoClient = require('mongodb').MongoClient;
 
 function Db(){
-  var url = "mongodb://localhost:27017/";
+  var url = "mongodb://10.2.40.110:27017/";
 
   // 插入数据
   this.insert = function(data){
