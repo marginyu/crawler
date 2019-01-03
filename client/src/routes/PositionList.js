@@ -149,29 +149,33 @@ class PositionList extends Component{
       pageIndex: current
     };
     post(`${config.server}/getPositionList`, params).then((data)=>{
-      console.log(data);
-      this.setState({
-        dataSource: data.data.result,
-        count: data.data.count
-      });
-      if(data.data.condition.districtOptions.length > 0){
+      console.log('获取职位列表', data);
+      if(data !== false){
         this.setState({
-          condition:data.data.condition
+          dataSource: data.result,
+          count: data.count
         });
+        if(data.condition.districtOptions.length > 0){
+          this.setState({
+            condition:data.condition
+          });
+        }
       }
     });
   };
 
   getStatis = ()=>{
     request(`${config.server}/getStatis`).then((data)=>{
-      console.log(data);
-      const _data = data.data.map((d,index)=>{
-        d.averageSalary = d.averageSalary + 'k';
-        return d;
-      });
-      this.setState({
-        statis: _data
-      });
+      console.log('获取统计信息', data);
+      if(data !== false){
+        const _data = data.map((d,index)=>{
+          d.averageSalary = d.averageSalary + 'k';
+          return d;
+        });
+        this.setState({
+          statis: _data
+        });
+      }
     });
   };
 
@@ -185,7 +189,7 @@ class PositionList extends Component{
     return (
       <div>
         <h1>薪资分布</h1>
-      <Chart data={this.state.statis}  forceFit>
+      <Chart data={this.state.statis}  forceFit height={500}>
         <Axis name="averageSalary" />
         <Axis name="count" />
         <Tooltip

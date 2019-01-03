@@ -25,7 +25,7 @@ class Login extends Component{
         };
         post(`${config.server}/login`, params).then((data)=>{
           console.log('返回', data);
-          if(data.data.errcode == 0){
+          if(data.errcode == 0){
             message.success('登录成功');
             that.props.dispatch(
               routerRedux.push({
@@ -33,7 +33,7 @@ class Login extends Component{
               })
             );
           }else{
-            message.warn('登录失败');
+            message.warn('账号或者密码不正确');
           }
         });
       }
